@@ -72,7 +72,7 @@ def bad_request(message=None):
     return resp
 
 @app.errorhandler(404)
-def not_found():
+def not_found(message=None):
     resp = jsonify({
         'error': {
             'code': 404,
