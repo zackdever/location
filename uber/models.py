@@ -13,13 +13,14 @@ class Location:
                 'name'    : data.pop('name')
             }
 
-            if has_id:
-                parsed['_id'] = ObjectId(data.pop('id'))
+            if has_id: parsed['_id'] = ObjectId(data.pop('id'))
         except (KeyError, ValueError, TypeError, InvalidId):
             return None
 
         # check that there is no extra data, and that address and name aren't empty
-        if len(data) != 0 or len(parsed['address']) == 0 or len(parsed['name']) == 0:
+        if (len(data) != 0 or
+            len(parsed['address']) == 0 or
+            len(parsed['name']) == 0):
             return None
 
         return parsed

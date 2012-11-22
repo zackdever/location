@@ -47,7 +47,6 @@ def location(id):
 
         app.db.locations.save(updated)
         return jsonify(Location.flatten(updated))
-
     elif request.method == 'DELETE':
         app.db.locations.remove({ '_id' : oid })
         return Response(status=204, content_type='application/json')
