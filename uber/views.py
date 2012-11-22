@@ -1,6 +1,9 @@
 from bson.objectid import ObjectId
 from functools import wraps
+
 from flask import request, jsonify, url_for, Response
+from pymongo.errors import OperationFailure
+
 from uber import app
 from uber.models import Location
 
@@ -25,20 +28,22 @@ def locations():
         location = Location.parse_json(request.json, has_id=False)
         if not location: return bad_request()
 
-        app.db.locations.insert(location)
-        location = Location.flatten(location)
+        try:
+            app.db.locations.insert(location, safe=True)
+            location = Location.flatten(location)
 
-        resp = jsonify(location)
-        resp.status_code = 201
-        resp.headers['Location'] = url_for('locations') + location['id']
-        return resp
+            resp = jsonify(location)
+            resp.status_code = 201
+            resp.headers['Location'] = url_for('locations') + location['id']
+            return resp
+        except OperationFailure as e:
+            return server_error(str(e))
 
     # GET /locations/ - show all
     return jsonify({
         'locations' : [Location.flatten(loc) for loc in app.db.locations.find()]
     })
 
-@app.errorhandler(404)
 @app.route('/locations/<id>', methods = ['GET', 'PUT', 'DELETE'])
 @check_content_type
 def location(id):
@@ -54,16 +59,22 @@ def location(id):
         updated = Location.parse_json(request.json, has_id=True)
         if not updated or updated['_id'] != oid: return bad_request()
 
-        app.db.locations.save(updated)
-        return jsonify(Location.flatten(updated))
+        try:
+            app.db.locations.save(updated, safe=True)
+            return jsonify(Location.flatten(updated))
+        except OperationFailure as e:
+            return server_error(str(e))
     elif request.method == 'DELETE':
-        app.db.locations.remove({ '_id' : oid })
-        return Response(status=204, content_type='application/json')
+        try:
+            app.db.locations.remove({ '_id' : oid }, safe=True)
+            return Response(status=204, content_type='application/json')
+        except OperationFailure as e:
+            return server_error(str(e))
 
     # GET /location/<id> - show location with id
     return jsonify(Location.flatten(location))
 
-### Error handlers
+### Error handlers ####################
 @app.errorhandler(400)
 def bad_request(message=None):
     message = message if message != None else request.url
