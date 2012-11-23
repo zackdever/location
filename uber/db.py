@@ -3,4 +3,6 @@ import config
 
 def connect():
     conn = Connection(config.DB_HOST, config.DB_PORT)
-    return conn[config.DATABASE]
+    db = conn[config.DATABASE]
+    db.users.ensure_index('username', unique=True)
+    return db

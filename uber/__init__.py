@@ -1,15 +1,16 @@
 from flask import Flask
-from flask.ext.login import LoginManager
 
 from uber import db
+from uber.api import api
+from uber.auth import auth, setup_auth
+from uber.ui import ui
 
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
 
 app.db = db.connect()
-app.db.users.ensure_index('username', unique=True)
+setup_auth(app)
 
-app.login_manager = LoginManager()
-app.login_manager.setup_app(app)
-
-import uber.views
+app.register_blueprint(api, url_prefix='/api')
+app.register_blueprint(auth)
+app.register_blueprint(ui)

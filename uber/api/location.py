@@ -4,16 +4,18 @@ from bson.objectid import ObjectId
 class Location:
     @staticmethod
     def parse_json(data, has_id):
-        # ensure all the data is there
+        # ensure all data is there, though we don't care who they say the owner is
         try:
             parsed = {
                 'address' : data.pop('address'),
                 'lat'     : float(data.pop('lat')),
                 'lng'     : float(data.pop('lng')),
-                'name'    : data.pop('name')
+                'name'    : data.pop('name'),
             }
 
-            if has_id: parsed['_id'] = ObjectId(data.pop('id'))
+            if has_id:
+                parsed['_id'] = ObjectId(data.pop('id'))
+
         except (KeyError, ValueError, TypeError, InvalidId):
             return None
 
@@ -29,4 +31,5 @@ class Location:
     def flatten(data):
         data['id'] = str(data['_id'])
         del data['_id']
+        del data['owner']
         return data

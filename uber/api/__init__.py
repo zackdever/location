@@ -2,7 +2,7 @@ from functools import wraps
 
 from bson.objectid import ObjectId
 from flask import Blueprint, current_app, request, jsonify, url_for, Response
-from flask.ext.login import login_required
+from flask.ext.login import login_required, current_user
 from pymongo.errors import OperationFailure
 
 from uber.api.location import Location
@@ -26,9 +26,11 @@ def check_content_type(f):
 def locations():
     if request.method == 'POST':
         location = Location.parse_json(request.json, has_id=False)
-        if not location: return bad_request()
+        if not location:
+            return bad_request()
 
         try:
+            location['owner'] = current_user.id
             current_app.db.locations.insert(location, safe=True)
             location = Location.flatten(location)
 
@@ -41,8 +43,9 @@ def locations():
 
     # GET - show all
     return jsonify({
-        'locations': [Location.flatten(loc) for loc in current_app.db.locations.find()]
-    })
+        'locations': [Location.flatten(loc) for loc in
+            current_app.db.locations.find({ 'owner': current_user.id })]
+        })
 
 @api.route('/locations/<id>', methods = ['GET', 'PUT', 'DELETE'])
 @login_required
@@ -51,14 +54,16 @@ def location(id):
     if not ObjectId.is_valid(id):
         return bad_request("'id' is either missing or is of the wrong type")
 
-    # ok, the id's format is valid, but does it exist?
+    # does that resource exists and does it belong to the user?
     oid = ObjectId(id)
     location = current_app.db.locations.find_one(oid)
-    if not location: return not_found()
+    if not location or location['owner'] != current_user.id:
+        return not_found()
 
     if request.method == 'PUT':
         updated = Location.parse_json(request.json, has_id=True)
-        if not updated or updated['_id'] != oid: return bad_request()
+        if not updated or updated['_id'] != oid:
+            return bad_request()
 
         try:
             current_app.db.locations.save(updated, safe=True)

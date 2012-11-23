@@ -24,7 +24,7 @@ def login():
             user = current_app.db.users.find_one({ 'username': username })
 
             if user and bcrypt.hashpw(password, user['password']) == user['password']:
-                login_user(User(username, str(user['_id'])))
+                login_user(User(username, user['_id']))
                 return redirect(request.args.get('next') or url_for('ui.index'))
             else:
                 flash('That username and/or password is incorrect.', 'error')
@@ -50,7 +50,7 @@ def register():
             try:
                 userid = current_app.db.users.insert({
                             'username': username, 'password': hashed}, safe=True)
-                login_user(User(username, str(userid)))
+                login_user(User(username, userid))
                 flash('You are now logged in!', 'info')
                 return redirect(url_for('ui.index'))
             except DuplicateKeyError:
