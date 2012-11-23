@@ -12,22 +12,21 @@ class Location:
                 'lng'     : float(data.pop('lng')),
                 'name'    : data.pop('name')
             }
-        except (KeyError, ValueError):
+
+            if has_id: parsed['_id'] = ObjectId(data.pop('id'))
+        except (KeyError, ValueError, TypeError, InvalidId):
             return None
 
-        if has_id:
-            try:
-                parsed['id'] = ObjectId(data.pop('id'))
-            except (TypeError, InvalidId):
-                return None
-
         # check that there is no extra data, and that address and name aren't empty
-        if len(data) != 0 or len(parsed['address']) == 0 or len(parsed['name']) == 0:
+        if (len(data) != 0 or
+            len(parsed['address']) == 0 or
+            len(parsed['name']) == 0):
             return None
 
         return parsed
 
     @staticmethod
     def flatten(data):
-        data['id'] = str(data['id'])
+        data['id'] = str(data['_id'])
+        del data['_id']
         return data
