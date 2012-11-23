@@ -4,7 +4,7 @@ from functools import wraps
 import bcrypt
 from pymongo.errors import OperationFailure, DuplicateKeyError
 from flask import (request, jsonify, url_for, Response, render_template,
-    session, escape, redirect, flash)
+    escape, redirect, flash)
 from flask.ext.login import (logout_user, login_user, login_required, UserMixin,
     current_user)
 
@@ -33,9 +33,6 @@ def check_content_type(f):
                 return bad_request("Expected 'application/json', got '%s'" % ctype)
         return f(*args, **kwargs)
     return decorated
-@app.route('/pandas')
-@login_required
-def pandas(): return 'pandas'
 
 @app.route('/')
 def index():
@@ -64,6 +61,8 @@ def register():
 
     return render_template('register.html')
 
+app.login_manager.login_view = 'login'
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -75,20 +74,21 @@ def login():
             user = app.db.users.find_one({ 'username': username })
 
             if user and bcrypt.hashpw(password, user['password']) == user['password']:
-                login_user(User(user))
+                login_user(User(username, str(user['_id'])))
                 return redirect(request.args.get('next') or url_for('index'))
             else:
                 flash('That username and/or password is incorrect.', 'error')
 
-    return render_template('login.html')
+    next = request.args.get('next') or ''
+    return render_template('login.html', next=next)
 
 @app.route('/logout')
-#@login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
 @app.route('/api/locations/', methods = ['GET', 'POST'])
+@login_required
 @check_content_type
 def locations():
     if request.method == 'POST':
@@ -112,6 +112,7 @@ def locations():
     })
 
 @app.route('/api/locations/<id>', methods = ['GET', 'PUT', 'DELETE'])
+@login_required
 @check_content_type
 def location(id):
     if not ObjectId.is_valid(id):
