@@ -1,9 +1,23 @@
 from bson.errors import InvalidId
 from bson.objectid import ObjectId
+#from flask import current_app
+from pymongo.errors import OperationFailure
 
 class Location:
+    #objects = current_app.db.locations
+
     @staticmethod
-    def parse_json(data, has_id):
+    def flatten(data):
+        data['id'] = str(data['_id'])
+        del data['_id']
+        del data['owner']
+        return data
+        pass
+
+    @staticmethod
+    def from_json(data, required_id=None):
+        if data is None: return None
+
         # ensure all data is there, though we don't care who they say the owner is
         try:
             parsed = {
@@ -13,8 +27,10 @@ class Location:
                 'name'    : data.pop('name'),
             }
 
-            if has_id:
+            if required_id is not None:
+                if not ObjectId.is_valid(id): return None
                 parsed['_id'] = ObjectId(data.pop('id'))
+                if parsed['_id'] != required_id: return None
 
         except (KeyError, ValueError, TypeError, InvalidId):
             return None
@@ -26,10 +42,3 @@ class Location:
             return None
 
         return parsed
-
-    @staticmethod
-    def flatten(data):
-        data['id'] = str(data['_id'])
-        del data['_id']
-        del data['owner']
-        return data

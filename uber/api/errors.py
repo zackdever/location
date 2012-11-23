@@ -1,44 +1,37 @@
 from flask import request, jsonify
+from pymongo.errors import OperationFailure
 
-from uber.auth import auth
+from uber.api import api
 
-@auth.errorhandler(400)
+@api.errorhandler(400)
 def bad_request(message=None):
-    message = message if message != None else 'Bad Request: %s' % request.url
-    resp = jsonify({
-        'error': {
-            'code': 400,
-            'message': message
-        }
-    })
+    return _make_json_error(400, 'Bad Request', message)
 
-    resp.status_code = 400
-    return resp
+@api.errorhandler(401)
+def unauthorized(message=None):
+    return _make_json_error(401, 'Unathorized: %s' % request.url, message)
 
-@auth.errorhandler(404)
+@api.errorhandler(403)
+def forbidden(message=None):
+    return _make_json_error(403, 'Forbidden: %s' % request.url, message)
+
+@api.errorhandler(404)
 def not_found(message=None):
-    message = message if message != None else 'Not Found: %s' % request.url
-    resp = jsonify({
-        'error': {
-            'code': 404,
-            'message': message,
-        }
-    })
+    return _make_json_error(404, 'Not Found: %s' % request.url, message)
 
-    resp.status_code = 404
-    return resp
-
-# AssertionError: It is currently not possible to register a 500
-# internal server error on a per-blueprint level.
-#@auth.errorhandler(500)
+# it's not possible to register a 500 error handler on a Blueprint as of writing
 def server_error(message=None):
-    message = message if message != None else "It's me, not you."
+    return _make_json_error(500, 'Internal Server Error', message)
+
+def _make_json_error(code, default_message, message=None):
+    message = default_message if message is None else message
     resp = jsonify({
         'error': {
-            'code': 500,
-            'message':  message,
+            'code': code,
+            'message':  str(message),
         }
     })
 
-    resp.status_code = 500
+    resp.status_code = code
     return resp
+
