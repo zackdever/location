@@ -72,16 +72,21 @@ $(function(){
     },
 
     initialize: function() {
+      var location = this.model.getLocation();
+
       this.marker = new google.maps.Marker({
         map : app.mapView.map,
-        place : this.model.getLocation()
+        place : location
       });
+
+      app.mapView.zoomTo(location);
+
       this.model.on('change', this.render, this);
       this.model.on('destroy', this.remove, this);
     },
 
     render: function() {
-      this.$el.html(this.template(this.model.toJSON()));
+      this._renderTemplate();
 
       this.input_name = this.$('input.name');
       this.input_address = this.$('input.address');
@@ -94,9 +99,17 @@ $(function(){
       return this;
     },
 
+    _renderTemplate: function() {
+      this.$el.html(this.template(this.model.toJSON()));
+    },
+
     focusMapToSelf: function() {
-      this.marker.getMap().setCenter(this.marker.getPosition());
-      this.marker.getMap().setZoom(16);
+      var map = this.marker.getMap();
+
+      // map will be null if we've just deleted it.
+      if (map) {
+        app.mapView.zoomTo(this.marker.getPosition());
+      }
     },
 
     // Switch this view into `"editing"` mode, displaying the input field.
@@ -120,6 +133,9 @@ $(function(){
             console.log('notify user, rollback changes, yada yada');
           }, this)
         });
+      } else {
+        // undo any changes they may have made
+        this._renderTemplate();
       }
 
       this.$el.removeClass('editing');
@@ -141,6 +157,7 @@ $(function(){
     // Remove the item, destroy the model.
     clear: function() {
       this.marker.setMap(null);
+      app.mapView.render();
       this.model.destroy();
     }
 
@@ -165,6 +182,25 @@ $(function(){
 
     initialize: function() {
       this.map = new google.maps.Map(this.el, this.options);
+    },
+
+    fitToLocations : function() {
+      var bounds = new google.maps.LatLngBounds();
+
+      locations.each(function(location) {
+        bounds.extend(location.getLocation());
+      });
+
+      this.map.fitBounds(bounds);
+    },
+
+    zoomTo: function(position) {
+      this.map.setCenter(position);
+      this.map.setZoom(16);
+    },
+
+    render : function() {
+      this.fitToLocations();
     }
 
   });
@@ -258,7 +294,6 @@ $(function(){
     // the App already present in the HTML.
     el: $('#app'),
 
-
     // At initialization we bind to the relevant events on the `Location`
     // collection, when items are added or changed. Kick things off by
     // loading any preexisting locations.
@@ -287,6 +322,7 @@ $(function(){
     // Add all items in the **locations** collection at once.
     addAll: function() {
       locations.each(this.addOne);
+      this.mapView.render();
     },
 
 
