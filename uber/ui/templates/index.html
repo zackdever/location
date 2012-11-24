@@ -1,3 +1,40 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 {% block body %}
+
+<div id='app'>
+  <header>
+    <h1>Locations</h1>
+    <input id='new-location' type='text' placeholder='Enter an address'>
+  </header>
+
+  <section id='main'>
+    <ul id='location-list'></ul>
+  </section>
+</div>
+
+<div id='instructions'>
+  Double-click to edit a location.
+</div>
+
+<div id='credits'>
+  Created by <a href='http://zackdever.com/'>zever</a>,
+  but heavily borrowed from <a href='http://documentcloud.github.com/backbone/examples/todos/index.html'>todos</a>.
+</div>
+
+ <!-- Templates -->
+
+<script type='text/template' id='item-template'>
+  <div class='view'>
+    <label><%- name %></label>
+    <label><%- address %></label>
+    <label><%- lat %></label>
+    <label><%- lng %></label>
+    <a class='destroy'></a>
+  </div>
+  <input class='edit name' type='text' value="<%- name %>" />
+  <input class='edit address' type='address' value="<%- address %>" />
+  <input class='edit lat' type='number' value="<%- lat %>" />
+  <input class='edit lng' type='number' value="<%- lng %>" />
+</script>
+
 {% endblock %}
