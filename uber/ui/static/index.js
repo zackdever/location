@@ -1,7 +1,7 @@
 // Load the application once the DOM is ready, using `jQuery.ready`:
 $(function(){
 
-  // Location Model
+    // Location Model
   // --------------
   var Location = Backbone.Model.extend({
 
@@ -26,6 +26,15 @@ $(function(){
       if (!this.get('name')) {
         this.set({ 'name': defaults.name });
       }
+    },
+
+    getLocation: function() {
+      return new google.maps.LatLng(this.get('lat'), this.get('lng'));
+    },
+
+    getTitle: function() {
+      var name = this.get('name');
+      return name ? name : this.get('address');
     }
 
   });
@@ -38,8 +47,7 @@ $(function(){
     model: Location,
 
     comparator: function(location) {
-      var name = location.get('name');
-      return name ? name.toLowerCase() : location.get('address').toLowerCase();
+      return location.getTitle().toLowerCase();
     }
 
   });
@@ -55,6 +63,7 @@ $(function(){
     template: _.template($('#item-template').html()),
 
     events: {
+      'click .view'         : 'focusMapToSelf',
       'dblclick .view'      : 'edit',
       'click a.destroy'     : 'clear',
       'keypress .edit'      : 'updateOnEnter',
@@ -63,17 +72,31 @@ $(function(){
     },
 
     initialize: function() {
+      this.marker = new google.maps.Marker({
+        map : app.mapView.map,
+        place : this.model.getLocation()
+      });
       this.model.on('change', this.render, this);
       this.model.on('destroy', this.remove, this);
     },
 
     render: function() {
       this.$el.html(this.template(this.model.toJSON()));
-      this.input_name = this.$('.name');
-      this.input_address = this.$('.address');
-      this.input_lat = this.$('.lat');
-      this.input_lng = this.$('.lng');
+
+      this.input_name = this.$('input.name');
+      this.input_address = this.$('input.address');
+      this.input_lat = this.$('input.lat');
+      this.input_lng = this.$('input.lng');
+
+      this.marker.setPosition(this.model.getLocation());
+      this.marker.setTitle(this.model.getTitle());
+
       return this;
+    },
+
+    focusMapToSelf: function() {
+      this.marker.getMap().setCenter(this.marker.getPosition());
+      this.marker.getMap().setZoom(16);
     },
 
     // Switch this view into `"editing"` mode, displaying the input field.
@@ -117,7 +140,110 @@ $(function(){
 
     // Remove the item, destroy the model.
     clear: function() {
+      this.marker.setMap(null);
       this.model.destroy();
+    }
+
+  });
+
+  // Map View
+  // --------
+  var MapView = Backbone.Model.extend({
+    options : {
+      center    : new google.maps.LatLng(20, -95),
+      mapTypeId : google.maps.MapTypeId.ROADMAP,
+      zoom      : 1,
+      styles    : [{
+        featureType : 'all',
+        stylers     : [{
+          saturation : -50
+        }]
+      }]
+    },
+
+    el : document.getElementById('map'),
+
+    initialize: function() {
+      this.map = new google.maps.Map(this.el, this.options);
+    }
+
+  });
+
+  // Address Box View
+  var AddressView = Backbone.Model.extend({
+    options : {
+      //bounds: ,
+      types: ['geocode']
+    },
+
+    events: {
+    },
+
+    el : document.getElementById('new-location'),
+
+    initialize: function() {
+      this.input = $('#new-location');
+
+      this.bindAutoSelectOnEnterOrTab(this.el);
+      this.autoComplete = new google.maps.places.Autocomplete(
+                            this.el, this.options);
+
+      // events
+      google.maps.event.addListener(this.autoComplete, 'place_changed',
+                                    _.bind(this.createLocation, this));
+
+      this.input.focus();
+    },
+
+    reset : function() {
+      //this.autoComplete.unbindAll();
+      //this.autoComplete = new google.maps.places.Autocomplete(
+                            //this.el, this.options);
+    },
+
+    createLocation : function() {
+      var place = this.autoComplete.getPlace();
+      var data = {
+        address: this.input.val(),
+        name: '',
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng()
+      };
+
+      locations.create(data, {
+        'error': _.bind(function (model, xhr, options) {
+          console.log('notify user, rollback changes, yada yada');
+        }, this)
+      });
+
+      this.input.val('');
+      this.reset();
+    },
+
+    // credit: http://stackoverflow.com/a/11703018/962091
+    bindAutoSelectOnEnterOrTab : function(input) {
+      // store the original event binding function
+      var _addEventListener = (input.addEventListener) ?
+        input.addEventListener : input.attachEvent;
+
+      function addEventListenerWrapper(type, listener) {
+        // Simulate a 'down arrow' keypress on hitting 'return' or 'tab'
+        // when no pac suggestion is selected, and then trigger the original listener.
+        if (type == 'keydown') {
+          var orig_listener = listener;
+          listener = function(event) {
+            var suggestion_selected = $('.pac-item.pac-selected').length > 0;
+            if ((event.which == 13 || event.which == 9) && !suggestion_selected) {
+              var simulated_downarrow = $.Event('keydown', { keyCode: 40, which: 40 });
+              orig_listener.apply(input, [simulated_downarrow]);
+            }
+            orig_listener.apply(input, [event]);
+          };
+        }
+        _addEventListener.apply(input, [type, listener]);
+      }
+      input.addEventListener = addEventListenerWrapper;
+      input.attachEvent = addEventListenerWrapper;
     }
 
   });
@@ -132,16 +258,14 @@ $(function(){
     // the App already present in the HTML.
     el: $('#app'),
 
-    events: {
-      'keypress #new-location':  'createOnEnter'
-    },
 
     // At initialization we bind to the relevant events on the `Location`
     // collection, when items are added or changed. Kick things off by
     // loading any preexisting locations.
     initialize: function() {
 
-      this.input = this.$('#new-location');
+      this.mapView = new MapView;
+      this.addressView = new AddressView;
 
       locations.on('add', this.addOne, this);
       locations.on('reset', this.addAll, this);
@@ -151,7 +275,6 @@ $(function(){
       this.main = $('#main');
 
       locations.fetch();
-      this.input.focus();
     },
 
     // Add a single location item to the list by creating a view for it, and
@@ -166,20 +289,6 @@ $(function(){
       locations.each(this.addOne);
     },
 
-    // If you hit return in the main input field, create new **location** model,
-    // and save it.
-    createOnEnter: function(e) {
-      if (e.keyCode != 13) return;
-      if (!this.input.val()) return;
-
-      locations.create({ address: this.input.val() }, {
-        'error': _.bind(function (model, xhr, options) {
-          console.log('notify user, rollback changes, yada yada');
-        }, this)
-      });
-
-      this.input.val('');
-    }
 
   });
 

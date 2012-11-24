@@ -13,6 +13,12 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
+#map {
+  height: 400px;
+  margin: 20px 0;
+  border: #bbb 1px solid;
+}
+
 #auth {
   font-weight: 600;
 }
@@ -157,16 +163,20 @@ input::-webkit-input-placeholder {
 #location-list li .view label {
   line-height: 1.5em;
   width: 444px;
-  display: block;
+  font-size: 18px;
+  color: #777;
+  display: inline-block;
   word-break: break-word;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   -o-text-overflow: ellipsis;
 }
-#location-list li .view label.address {
-  font-size: 75%;
-  color: #777;
+
+#location-list li .view label .name {
+  font-size: 24px;
+  color: black;
+  margin-right: 10px;
 }
 
 #location-list li .view label:first-child {
