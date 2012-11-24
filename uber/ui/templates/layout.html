@@ -6,21 +6,33 @@
   <link rel='stylesheet' href="{{ url_for('static', filename='index.css') }}">
 </head>
 <body>
-  {% for message in get_flashed_messages() %}
-    <div class='flash'>{{ message }}</div>
-  {% endfor %}
+  <div id='main'>
+    <header>
+      {% for message in get_flashed_messages() %}
+        <div class='flash'><p>{{ message }}</p></div>
+      {% endfor %}
 
-  {% if current_user.is_authenticated() %}
-    <a href={{ url_for('auth.logout') }}>logout</a>
-  {% else %}
-    <a href={{ url_for('auth.login') }}>login</a>
-  {% endif %}
+      {% if current_user.is_authenticated() %}
+        <div id='auth'>
+          <p>
+            <a href={{ url_for('auth.logout') }}>logout</a>
+            <span class='hello'>hello, {{ current_user.username }}</span>
+          </p>
+        </div>
+      {% endif %}
 
-  {% block body %}{% endblock %}
+      <h1>Locations</h1>
+    </header>
+    {% block body %}{% endblock %}
+  </div>
 
-  <script src="{{ url_for('static', filename='vendor/jquery.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendor/underscore.js') }}"></script>
-  <script src="{{ url_for('static', filename='vendor/backbone.js') }}"></script>
-  <script src="{{ url_for('static', filename='index.js') }}"></script>
+  {% block submain %}{% endblock %}
+
+  <div id='credits'>
+    Created by <a href='http://zackdever.com/'>zever</a>,
+    but heavily borrowed from <a href='http://documentcloud.github.com/backbone/examples/todos/index.html'>todos</a>.
+  </div>
+
+  {% block scripts %}{% endblock %}
 </body>
 </html>

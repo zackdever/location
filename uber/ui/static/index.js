@@ -35,7 +35,12 @@ $(function(){
   var LocationList = Backbone.Collection.extend({
 
     url: '/api/locations/',
-    model: Location
+    model: Location,
+
+    comparator: function(location) {
+      var name = location.get('name');
+      return name ? name.toLowerCase() : location.get('address').toLowerCase();
+    }
 
   });
 
@@ -50,9 +55,11 @@ $(function(){
     template: _.template($('#item-template').html()),
 
     events: {
-      'dblclick .view'  : 'edit',
-      'click a.destroy' : 'clear',
-      'keypress .edit'  : 'updateOnEnter'
+      'dblclick .view'      : 'edit',
+      'click a.destroy'     : 'clear',
+      'keypress .edit'      : 'updateOnEnter',
+      'click button.save'   : 'update',
+      'click button.cancel' : 'cancel'
     },
 
     initialize: function() {
@@ -76,26 +83,36 @@ $(function(){
     },
 
     // Close the `"editing"` mode, saving changes to the location.
-    close: function() {
-      var values = {
-        name: this.input_name.val(),
-        address: this.input_address.val(),
-        lat: this.input_lat.val(),
-        lng: this.input_lng.val()
-      }
+    close: function(save) {
+      if (save) {
+        var values = {
+          name: this.input_name.val(),
+          address: this.input_address.val(),
+          lat: this.input_lat.val(),
+          lng: this.input_lng.val()
+        }
 
-      this.model.save(values, {
-        'error': _.bind(function (model, xhr, options) {
-          console.log('notify user, rollback changes, yada yada');
-        }, this)
-      });
+        this.model.save(values, {
+          'error': _.bind(function (model, xhr, options) {
+            console.log('notify user, rollback changes, yada yada');
+          }, this)
+        });
+      }
 
       this.$el.removeClass('editing');
     },
 
     // If you hit `enter`, we're through editing the item.
     updateOnEnter: function(e) {
-      if (e.keyCode == 13) this.close();
+      if (e.keyCode == 13) this.update();
+    },
+
+    update: function(e) {
+      this.close(true);
+    },
+
+    cancel: function(e) {
+      this.close(false);
     },
 
     // Remove the item, destroy the model.
@@ -137,14 +154,6 @@ $(function(){
       this.input.focus();
     },
 
-    render: function() {
-      if (locations.length) {
-        this.main.show();
-      } else {
-        this.main.hide();
-      }
-    },
-
     // Add a single location item to the list by creating a view for it, and
     // appending its element to the `<ul>`.
     addOne: function(location) {
@@ -175,6 +184,6 @@ $(function(){
   });
 
   // Finally, we kick things off by creating the **App**.
-  var App = new AppView;
+  var app = new AppView;
 
 });

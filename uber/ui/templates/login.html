@@ -1,8 +1,16 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 {% block body %}
-  <form action='/login{{ action_args }}' method='post'>
-    username <input type='text' name='username'><br>
-    password <input type='password' name='password'><br>
+
+<div class='auth'>
+
+  <form action='{{ url_for("auth.login") }}{{ action_args }}' method='post'>
+    <label for='uesrname'>username</label><input type='text' name='username'><br>
+    <label for='password'>password</label><input type='password' name='password'><br>
     <input type='submit' value='login'>
   </form>
+
+  <h4><a href='{{ url_for("auth.register") }}'>create an account</a></h4>
+
+</div>
+
 {% endblock %}

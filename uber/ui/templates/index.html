@@ -1,40 +1,48 @@
 {% extends 'layout.html' %}
 {% block body %}
 
-<div id='app'>
-  <header>
-    <h1>Locations</h1>
+  <div id='app'>
     <input id='new-location' type='text' placeholder='Enter an address'>
-  </header>
-
-  <section id='main'>
     <ul id='location-list'></ul>
-  </section>
-</div>
-
-<div id='instructions'>
-  Double-click to edit a location.
-</div>
-
-<div id='credits'>
-  Created by <a href='http://zackdever.com/'>zever</a>,
-  but heavily borrowed from <a href='http://documentcloud.github.com/backbone/examples/todos/index.html'>todos</a>.
-</div>
-
- <!-- Templates -->
-
-<script type='text/template' id='item-template'>
-  <div class='view'>
-    <label><%- name %></label>
-    <label><%- address %></label>
-    <label><%- lat %></label>
-    <label><%- lng %></label>
-    <a class='destroy'></a>
   </div>
-  <input class='edit name' type='text' value="<%- name %>" />
-  <input class='edit address' type='address' value="<%- address %>" />
-  <input class='edit lat' type='number' value="<%- lat %>" />
-  <input class='edit lng' type='number' value="<%- lng %>" />
-</script>
 
+   <!-- Templates -->
+
+  <script type='text/template' id='item-template'>
+    <div class='view'>
+      <label><%- name %></label>
+      <label class='address'><%- address %></label>
+      <a class='destroy'></a>
+    </div>
+
+    <div class="edit">
+      <label>name</label>
+      <input class='name' type='text' value="<%- name %>" /><br />
+
+      <label>address</label>
+      <input class='address' type='text' value="<%- address %>" /><br />
+
+      <label>latitude</label>
+      <input class='lat' type='number' value="<%- lat %>" /><br />
+
+      <button class='save'>save</button>
+      <button class='cancel'>cancel</button>
+      <label>longitude</label>
+      <input class='lng' type='number' value="<%- lng %>" />
+    </div>
+  </script>
+
+{% endblock %}
+
+{% block submain %}
+  <div id='instructions'>
+    Double-click to edit a location.
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='vendor/jquery.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/underscore.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/backbone.js') }}"></script>
+  <script src="{{ url_for('static', filename='index.js') }}"></script>
 {% endblock %}

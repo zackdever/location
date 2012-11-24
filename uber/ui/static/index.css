@@ -13,7 +13,19 @@ body {
 	-webkit-font-smoothing: antialiased;
 }
 
-#app {
+#auth {
+  font-weight: 600;
+}
+
+#auth .hello {
+  color: #39c;
+}
+
+#auth a {
+  float: right;
+}
+
+#main {
 	background: #fff;
 	padding: 20px;
 	margin-bottom: 40px;
@@ -29,16 +41,37 @@ body {
 	border-radius: 0 0 5px 5px;
 }
 
-#app h1 {
+#main h1 {
 	font-size: 36px;
 	font-weight: bold;
 	text-align: center;
 	padding: 0 0 10px 0;
 }
 
-#app input[type="text"], #app input[type="number"] {
-	width: 466px;
-	font-size: 24px;
+#new-location {
+  width: 466px;
+  font-size: 24px;
+  font-family: inherit;
+  line-height: 1.4em;
+  border: 0;
+  outline: none;
+  padding: 6px;
+  border: 1px solid #999999;
+  -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+  -moz-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+  -ms-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+  -o-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+}
+
+.edit label {
+  width: 25%;
+  display: inline-block;
+}
+
+.edit input[type="text"], .edit input[type="number"] {
+  width: 70%;
+	font-size: 14px;
 	font-family: inherit;
 	line-height: 1.4em;
 	border: 0;
@@ -52,12 +85,12 @@ body {
 	box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
 }
 
-#app input::-webkit-input-placeholder {
-	font-style: italic;
+.edit input[type="number"] {
+  width: 25%;
 }
 
-#main {
-	display: none;
+input::-webkit-input-placeholder {
+	font-style: italic;
 }
 
 #location-list {
@@ -102,7 +135,6 @@ body {
 }
 
 #location-list li.editing {
-	border-bottom: none;
 	margin-top: -1px;
 	padding: 0;
 }
@@ -123,6 +155,21 @@ body {
 }
 
 #location-list li .view label {
+  line-height: 1.5em;
+  width: 444px;
+  display: block;
+  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -o-text-overflow: ellipsis;
+}
+#location-list li .view label.address {
+  font-size: 75%;
+  color: #777;
+}
+
+#location-list li .view label:first-child {
 	word-break: break-word;
 }
 
@@ -150,4 +197,84 @@ body {
 
 #credits a {
 	color: #888;
+}
+
+.auth {
+  margin: 60px 0;
+  text-align: center;
+	font-size: 24px;
+	font-family: inherit;
+	line-height: 1.4em;
+  padding-bottom: 20px;
+}
+
+.auth label {
+  width: 25%;
+  display: inline-block;
+}
+
+.auth input[type='text'], .auth input[type='password'] {
+  width: 60%;
+	font-size: 24px;
+	font-family: inherit;
+	line-height: 1.4em;
+	border: 0;
+	outline: none;
+	padding: 6px;
+  margin: 6px;
+	border: 1px solid #999999;
+	-webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+	-moz-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+	-ms-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+	-o-box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+	box-shadow: rgba(0, 0, 0, 0.2) 0 1px 2px 0 inset;
+}
+
+.auth input[type='password'] {
+  letter-spacing: 6px;
+}
+
+.auth input[type='submit'] {
+  padding: 10px 20px;
+  margin: 30px;
+  clear: both;
+}
+.auth input[type='submit'], button {
+  padding: 10px 20px;
+  float: right;
+  border: none;
+  font-size: 16px;
+  color: white;
+	-webkit-border-radius: 5px 5px 5px 5px;
+	-moz-border-radius: 5px 5px 5px 5px;
+	-ms-border-radius: 5px 5px 5px 5px;
+	-o-border-radius: 5px 5px 5px 5px;
+  background: -webkit-gradient(linear, left bottom, left top, color-stop(0, #06c), color-stop(1,     #39c));
+  background: -webkit-linear-gradient(bottom, #06c 0%, #39c 100%);
+  background: -moz-linear-gradient(bottom, #06c 0%, #39c 100%);
+  background: -o-linear-gradient(bottom, #06c 0%, #39c 100%);
+  background: -ms-linear-gradient(bottom, #06c 0%, #39c 100%);
+  background: linear-gradient(bottom, #06c 0%, #39c 100%);
+  font-weight: 600;
+}
+.auth h4 {
+  padding-left: 8px;
+  padding-top: 18px;
+  float: left;
+  margin-left: 20px;
+  font-size: 16px;
+}
+
+.flash {
+  display: inline;
+}
+.flash p {
+	text-align: center;
+  background: #7fddff;
+  padding: 10px;
+	-webkit-border-radius: 5px 5px 5px 5px;
+	-moz-border-radius: 5px 5px 5px 5px;
+	-ms-border-radius: 5px 5px 5px 5px;
+	-o-border-radius: 5px 5px 5px 5px;
+	border-radius: 5px 5px 5px 5px;
 }

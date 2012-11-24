@@ -1,7 +1,7 @@
 import bcrypt
 from flask import (current_app, escape, flash, redirect, render_template,
     request, url_for)
-from flask.ext.login import logout_user, login_user
+from flask.ext.login import current_user, logout_user, login_user
 from pymongo.errors import DuplicateKeyError
 
 from uber.auth import auth
@@ -23,6 +23,8 @@ def login():
             else:
                 flash('That username and/or password is incorrect.', 'error')
 
+    if current_user.is_authenticated():
+        return redirect(url_for('ui.index'))
     next = request.args.get('next')
     action_args = '?next=%s' % next if next is not None else ''
     return render_template('login.html', action_args=action_args)
@@ -30,7 +32,7 @@ def login():
 @auth.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('ui.index'))
+    return redirect(url_for('auth.login'))
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
@@ -45,7 +47,6 @@ def register():
                 userid = current_app.db.users.insert({
                             'username': username, 'password': hashed}, safe=True)
                 login_user(User(username, userid))
-                flash('You are now logged in!', 'info')
                 return redirect(url_for('ui.index'))
             except DuplicateKeyError:
                 flash("Sorry, but '%s' is already taken." % escape(username),
