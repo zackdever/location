@@ -16,6 +16,7 @@ var app = app || {};
       };
     },
 
+    // We're starting with an address, so default everything else in.
     initialize: function() {
       var defaults = this.defaults();
 
@@ -30,10 +31,12 @@ var app = app || {};
       }
     },
 
+    // Return lat/lng as a google.maps.LatLng object for use with a map.
     getLocation: function() {
       return new google.maps.LatLng(this.get('lat'), this.get('lng'));
     },
 
+    // Determine a title - name if it's set, the address if not.
     getTitle: function() {
       var name = this.get('name');
       return name ? name : this.get('address');

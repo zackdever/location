@@ -3,13 +3,18 @@ var app = app || {};
 (function () {
 
   // Address Box View
+  // ----------------
+  // Google auto-complete location box set.
   app.AddressView = Backbone.View.extend({
+
+    // only return address location results (not places)
     options : {
       types: ['geocode']
     },
 
     el : document.getElementById('new-location'),
 
+    // Wire up the google auto-complete to the input box.
     initialize: function() {
       this.input = $('#new-location');
 
@@ -17,20 +22,24 @@ var app = app || {};
       this.autoComplete = new google.maps.places.Autocomplete(
                             this.el, this.options);
 
-      // events
+      // must use google's own events
       google.maps.event.addListener(this.autoComplete, 'place_changed',
                                     _.bind(this.createLocation, this));
 
       this.input.focus();
     },
 
+    // Clear any text in the box, close the name location view,
+    // and set the map back to showing all locations rather than this one.
     reset : function() {
       this.input.val('');
       this.input.focus();
-      this.nameLocationView.close();
+      this.marker.setMap(null);
       app.i.mapView.fitToLocations();
     },
 
+    // Create a location based on the address in the auto-complete box,
+    // display it on the map, and show a form to name and save it.
     createLocation : function() {
       var place = this.autoComplete.getPlace();
 
@@ -41,20 +50,30 @@ var app = app || {};
         name    : ''
       });
 
-      // show it on the map
-      app.i.mapView.zoomTo(this.model.getLocation());
-
       this.model.on('change:name', this.saveLocation, this);
       this.model.on('destroy', this.reset, this);
-      this.nameLocationView = new app.NameLocationView({ model: this.model });
-      this.nameLocationView.render();
+
+      var view = new app.NameLocationView({ model: this.model });
+      $('#name-location').html(view.render().el);
+      $('#name-location input').focus();
+
+      // show it on the map
+      var location = this.model.getLocation();
+      app.i.mapView.zoomTo(location);
+
+      this.marker = new google.maps.Marker({
+        map : app.i.mapView.map,
+        position : location
+      });
     },
 
+    // Save the location based on the address box to the server.
     saveLocation : function() {
       this.model.save(null, {
 
         'success': _.bind(function (model, response, options) {
           this.model.off('change', this.saveLocation, this);
+          this.model.trigger('sync');
           app.Locations.push(this.model);
           this.reset();
         }, this),
@@ -67,6 +86,9 @@ var app = app || {};
     },
 
     // credit: http://stackoverflow.com/a/11703018/962091
+    //
+    // Google's auto-complete box has some annoying tendencies, like
+    // not being able to auto-select the first entry, so we make it so.
     bindAutoSelectOnEnterOrTab : function(input) {
       // store the original event binding function
       var _addEventListener = (input.addEventListener) ?

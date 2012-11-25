@@ -17,6 +17,8 @@ var app = app || {};
     // loading any preexisting locations.
     initialize: function() {
 
+      app.Locations = new app.LocationList;
+
       this.mapView = new app.MapView;
       this.addressView = new app.AddressView;
 
@@ -43,5 +45,4 @@ var app = app || {};
       this.mapView.render();
     }
   });
-
 })();

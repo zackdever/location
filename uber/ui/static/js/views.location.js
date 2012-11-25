@@ -4,6 +4,9 @@ var app = app || {};
 
   // Location Item View
   // ------------------
+  // Basic view (name, address, lat/lng), plus an edit
+  // form with save/cancel buttons.
+  // Also updates marker on map.
   app.LocationView = Backbone.View.extend({
 
     tagName:  'li',
@@ -24,7 +27,7 @@ var app = app || {};
 
       this.marker = new google.maps.Marker({
         map : app.i.mapView.map,
-        place : location
+        position : location
       });
 
       app.i.mapView.zoomTo(location);
@@ -34,13 +37,9 @@ var app = app || {};
       this.model.on('destroy', this.remove, this);
     },
 
+    // Render the template, update the map marker.
     render: function() {
       this._renderTemplate();
-
-      this.input_name = this.$('input.name');
-      this.input_address = this.$('input.address');
-      this.input_lat = this.$('input.lat');
-      this.input_lng = this.$('input.lng');
 
       this.marker.setPosition(this.model.getLocation());
       this.marker.setTitle(this.model.getTitle());
@@ -48,10 +47,17 @@ var app = app || {};
       return this;
     },
 
+    // A strict rendering of just the template.
     _renderTemplate: function() {
       this.$el.html(this.template(this.model.toJSON()));
+
+      this.input_name = this.$('input.name');
+      this.input_address = this.$('input.address');
+      this.input_lat = this.$('input.lat');
+      this.input_lng = this.$('input.lng');
     },
 
+    // Zoom the map to this location.
     focusMapToSelf: function() {
       var map = this.marker.getMap();
 
@@ -95,10 +101,12 @@ var app = app || {};
       if (e.keyCode == 13) this.update();
     },
 
+    // Close editing mode, save the model.
     update: function(e) {
       this.close(true);
     },
 
+    // Cancel editing mode, discard changes.
     cancel: function(e) {
       this.close(false);
     },

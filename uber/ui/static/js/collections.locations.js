@@ -16,6 +16,4 @@ var app = app || {};
 
   });
 
-  app.Locations = new app.LocationList;
-
 })();

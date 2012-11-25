@@ -58,11 +58,11 @@ body {
 	padding: 0 0 10px 0;
 }
 
-#name-location { padding-top: 10px; }
-#name-location input { width: 280px; }
-#name-location button { padding: 14px 12px; margin: 4px; }
+#name-location .edit { padding-top: 10px; }
+#name-location .edit input { width: 280px; }
+#name-location .edit button { padding: 14px 12px; margin: 4px; }
 #new-location { width: 466px; }
-#new-location, #name-location input {
+#new-location, #name-location .edit input {
   font-size: 24px;
   font-family: inherit;
   line-height: 1.4em;
