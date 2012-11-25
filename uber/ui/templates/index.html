@@ -6,11 +6,17 @@
     <input id='new-location' type='text' placeholder='Enter an address'>
     <div id='map'></div>
     <div id='name-location'> </div>
+
+    <div id='instructions'>
+      Click a location to zoom map, double-click to edit.
+    </div>
+
     <ul id='location-list'></ul>
   </div>
 
-   <!-- Templates -->
+  <!-- Templates -->
 
+  <!-- Name a location template -->
   <script type='text/template' id='name-template'>
     <div class='edit'>
       <input type='text' tabindex=100 placeholder='Name e.g. Work'>
@@ -19,6 +25,7 @@
     </div>
   </script>
 
+  <!-- Location template (view and edit)-->
   <script type='text/template' id='item-template'>
     <div class='view'>
       <label>
@@ -49,13 +56,8 @@
 
 {% endblock %}
 
-{% block submain %}
-  <div id='instructions'>
-    Click a location to zoom map, double-click to edit.
-  </div>
-{% endblock %}
-
 {% block scripts %}
+  <!-- These should really be uglified and minified -->
   <script src='//ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js'></script>
   <script src='//maps.googleapis.com/maps/api/js?libraries=places&key={{ map_api_key }}&sensor=false'></script>
   <script src="{{ url_for('static', filename='js/vendor/jquery.js') }}"></script>
