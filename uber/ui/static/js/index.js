@@ -1,9 +1,10 @@
 // Load the application once the DOM is ready, using `jQuery.ready`:
 $(function(){
 
-    // Location Model
+  // Location Model
   // --------------
   var Location = Backbone.Model.extend({
+    urlRoot: 'api/locations/',
 
     defaults: function() {
       return {
@@ -157,8 +158,8 @@ $(function(){
     // Remove the item, destroy the model.
     clear: function() {
       this.marker.setMap(null);
-      app.mapView.render();
       this.model.destroy();
+      app.mapView.render();
     }
 
   });
@@ -187,11 +188,21 @@ $(function(){
     fitToLocations : function() {
       var bounds = new google.maps.LatLngBounds();
 
-      locations.each(function(location) {
-        bounds.extend(location.getLocation());
-      });
+      if (locations.length) {
+        locations.each(function(location) {
+          bounds.extend(location.getLocation());
+        });
 
-      this.map.fitBounds(bounds);
+        this.map.fitBounds(bounds);
+      } else {
+        this.showWorld();
+      }
+
+    },
+
+    showWorld: function() {
+      this.map.setCenter(this.options.center);
+      this.map.setZoom(1);
     },
 
     zoomTo: function(position) {
@@ -205,14 +216,51 @@ $(function(){
 
   });
 
-  // Address Box View
-  var AddressView = Backbone.Model.extend({
-    options : {
-      //bounds: ,
-      types: ['geocode']
-    },
+  // Name Location View
+  var NameLocationView = Backbone.View.extend({
+    el : $('#name-location'),
+
+    template: _.template($('#name-template').html()),
 
     events: {
+      'click .save'    : 'updateName',
+      'click .cancel'  : 'cancel',
+      'keypress input' : 'updateOnEnter'
+    },
+
+    updateOnEnter: function(e) {
+      if (e.keyCode == 13) this.updateName();
+    },
+
+    initialize: function() {
+      this.input = $('#name-location input');
+    },
+
+    updateName : function () {
+      this.model.set('name', this.input.val());
+    },
+
+    render: function () {
+      this.$el.html(this.template());
+      this.input = $('#name-location input');
+      this.input.focus();
+      return this;
+    },
+
+    cancel: function () {
+      app.addressView.reset();
+    },
+
+    close: function () {
+      this.$el.html('');
+    }
+
+  });
+
+  // Address Box View
+  var AddressView = Backbone.View.extend({
+    options : {
+      types: ['geocode']
     },
 
     el : document.getElementById('new-location'),
@@ -232,28 +280,44 @@ $(function(){
     },
 
     reset : function() {
-      //this.autoComplete.unbindAll();
-      //this.autoComplete = new google.maps.places.Autocomplete(
-                            //this.el, this.options);
+      this.input.val('');
+      this.input.focus();
+      this.nameLocationView.close();
+      app.mapView.fitToLocations();
     },
 
     createLocation : function() {
       var place = this.autoComplete.getPlace();
-      var data = {
-        address: this.input.val(),
-        name: '',
-        lat: place.geometry.location.lat(),
-        lng: place.geometry.location.lng()
-      };
 
-      locations.create(data, {
+      this.model = new Location({
+        address : this.input.val(),
+        lat     : place.geometry.location.lat(),
+        lng     : place.geometry.location.lng(),
+        name    : ''
+      });
+
+      // show it on the map
+      app.mapView.zoomTo(this.model.getLocation());
+
+      this.model.on('change:name', this.saveLocation, this);
+      this.nameLocationView = new NameLocationView({ model: this.model });
+      this.nameLocationView.render();
+    },
+
+    saveLocation : function() {
+      this.model.save(null, {
+
+        'success': _.bind(function (model, response, options) {
+          this.model.off('change', this.saveLocation, this);
+          locations.push(this.model);
+          this.reset();
+        }, this),
+
         'error': _.bind(function (model, xhr, options) {
           console.log('notify user, rollback changes, yada yada');
         }, this)
-      });
 
-      this.input.val('');
-      this.reset();
+      });
     },
 
     // credit: http://stackoverflow.com/a/11703018/962091
@@ -323,8 +387,7 @@ $(function(){
     addAll: function() {
       locations.each(this.addOne);
       this.mapView.render();
-    },
-
+    }
 
   });
 

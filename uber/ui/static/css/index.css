@@ -58,8 +58,11 @@ body {
 	padding: 0 0 10px 0;
 }
 
-#new-location {
-  width: 466px;
+#name-location { padding-top: 10px; }
+#name-location input { width: 280px; }
+#name-location button { padding: 14px 12px; margin: 4px; }
+#new-location { width: 466px; }
+#new-location, #name-location input {
   font-size: 24px;
   font-family: inherit;
   line-height: 1.4em;
@@ -133,7 +136,7 @@ input::-webkit-input-placeholder {
 	cursor: pointer;
 	width: 20px;
 	height: 20px;
-	background: url('./imgs/destroy.png') no-repeat;
+	background: url(../imgs/destroy.png) no-repeat;
 }
 
 #location-list li:hover .destroy {
