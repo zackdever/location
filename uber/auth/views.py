@@ -9,6 +9,9 @@ from uber.auth.models import User
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+    """Show the login page, and log in the user."""
+
+    # try to log the user in
     if request.method == 'POST':
         if 'username' not in request.form or 'password' not in request.form:
             flash('Please provide both your username and password', 'error')
@@ -23,19 +26,25 @@ def login():
             else:
                 flash('That username and/or password is incorrect.', 'error')
 
+    # if the user is already authenticated, go to the index page
     if current_user.is_authenticated():
         return redirect(url_for('ui.index'))
+
+    # if they were redirected here, bring them back once they're logged in
     next = request.args.get('next')
     action_args = '?next=%s' % next if next is not None else ''
+
     return render_template('login.html', action_args=action_args)
 
 @auth.route('/logout')
 def logout():
+    """Log the user out."""
     logout_user()
     return redirect(url_for('auth.login'))
 
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
+    """Show the registration page and register a new user."""
     if request.method == 'POST':
         if 'username' not in request.form or 'password' not in request.form:
             flash('Please provide both a username and password.', 'error')

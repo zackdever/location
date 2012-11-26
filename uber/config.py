@@ -1,8 +1,6 @@
-#TODO allow to be set via env vars
-
 DEBUG = True
 
-SECRET_KEY = 'frump' # TODO make better
+SECRET_KEY = 'frump'
 
 DB_HOST = 'localhost'
 DB_PORT = 27017

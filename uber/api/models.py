@@ -3,10 +3,27 @@ from bson.objectid import ObjectId
 from flask.ext.login import current_user
 
 class Location:
-    #objects = current_app.db.locations
+    """Static methods to convert location JSON <-> Python.
+
+    A location is used to save a named address with corresponding lat/lng.
+
+    Location:
+        id (_id in Python)
+        address
+        lat
+        lng
+        name
+        owner (Python only)
+
+    Python includes an owner id, and id's are bson ObjectId objects.
+    JSON does not have an owner id, and the id's are strings.
+    """
+
 
     @staticmethod
     def flatten(data):
+        """Convert from Python to JSON."""
+
         data['id'] = str(data['_id'])
         del data['_id']
 
@@ -16,7 +33,17 @@ class Location:
 
     @staticmethod
     def from_json(data, required_id=None):
-        "assume current user is owner"
+        """Convert from JSON to Python.
+
+        If the data is a new object to be created, there is no required_id.
+        If it is supplied, ensure that it matches the id in data.
+        Also does some basic type checking.
+
+        required_id: the id that data should include.
+        returns: converted data as a dict, or None if there was a problem.
+        """
+
+        # assume current user is owner
         if data is None: return None
 
         try:
@@ -28,6 +55,7 @@ class Location:
                 'owner'   : current_user.id
             }
 
+            # check that id is there and that it matches
             if required_id is not None:
                 id = data.pop('id')
                 if not ObjectId.is_valid(id):

@@ -1,0 +1,6 @@
+- better README
+- allow configs to be set with env vars
+- make better secret key
+- test
+- requirements
+- deploy

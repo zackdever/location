@@ -6,6 +6,10 @@ from flask import request, abort
 from uber.api.errors import bad_request
 
 def ensure_json_content_type(f):
+    """Ensure the 'Content-Type' header is 'application/json'.
+
+    Wraps views. If the check fails, returns a 400 bad request.
+    """
     @wraps(f)
     def decorated(*args, **kwargs):
         ctype = request.headers['Content-Type']
@@ -15,6 +19,7 @@ def ensure_json_content_type(f):
     return decorated
 
 def get_or_404(objects, id):
+    """Get the object with id from objects, or abort with a 404."""
     if not ObjectId.is_valid(id):
         abort(404)
 
