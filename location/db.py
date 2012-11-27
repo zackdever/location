@@ -11,7 +11,7 @@ def connect():
     conn = Connection(config.DB_HOST, config.DB_PORT)
     db = conn[config.DATABASE]
 
-    if hasattr(config, 'DB_USER') and hasattr(config, 'DB_PW'):
+    if config.DB_USER and config.DB_PW:
         db.authenticate(config.DB_USER, config.DB_PW)
 
     db.users.ensure_index('username', unique=True)
