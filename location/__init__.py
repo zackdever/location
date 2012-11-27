@@ -10,7 +10,6 @@ from location.ui import ui
 
 # create a Flask app, force SSL when debug is False
 app = Flask(__name__, static_folder='./ui/static')
-SSLify(app, subdomains=True)
 app.config.from_pyfile('config.py')
 
 # set the below env var to your config file path to load custom configs
@@ -22,6 +21,7 @@ if os.environ.get(CONFIG_FILE_VAR) is not None:
 # setup
 app.db = db.connect()
 setup_auth(app)
+SSLify(app, subdomains=True)
 
 # register blueprints
 app.register_blueprint(api, url_prefix='/api')

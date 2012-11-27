@@ -8,17 +8,12 @@ For git-only deploy systems, this file checks for individual env vars as well.
 
 from os import environ
 
-DEBUG = bool(environ.get('LOCATION_DEBUG')) or True
+debug = environ.get('LOCATION_DEBUG')
+DEBUG = True if debug is None else debug
 
-HOST = environ.get('LOCATION_HOST') or '127.0.0.1'
 # not name-spaced, b/c heroku requires 'PORT', and that's good enough for now
 PORT = int(environ.get('PORT') or 5000)
-
-
-# you should change this, you could generate a new one with:
-#      import os
-#      os.urandom(24)
-SECRET_KEY = environ.get('LOCATION_SECRET_KEY') or """LK\xce6\xac"\x05R\xe1\xaa\x85\x8ctK\xc2\n\xef\x0f\x84\xf7`&\x1d7"""
+HOST = environ.get('LOCATION_HOST') or '127.0.0.1'
 
 # database
 DB_HOST = environ.get('LOCATION_DB_HOST') or 'localhost'
@@ -30,3 +25,8 @@ DATABASE = environ.get('LOCATION_DB') or 'location'
 # Google Maps API
 # https://developers.google.com/maps/documentation/javascript/tutorial#api_key
 MAPS_API_KEY = environ.get('LOCATION_MAPS_API_KEY') or ''
+
+# you should change this, you could generate a new one with:
+#      import os
+#      os.urandom(24)
+SECRET_KEY = environ.get('LOCATION_SECRET_KEY') or """LK\xce6\xac"\x05R\xe1\xaa\x85\x8ctK\xc2\n\xef\x0f\x84\xf7`&\x1d7"""
