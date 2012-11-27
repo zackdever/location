@@ -30,3 +30,6 @@ MAPS_API_KEY = environ.get('LOCATION_MAPS_API_KEY') or ''
 #      import os
 #      os.urandom(24)
 SECRET_KEY = environ.get('LOCATION_SECRET_KEY') or """LK\xce6\xac"\x05R\xe1\xaa\x85\x8ctK\xc2\n\xef\x0f\x84\xf7`&\x1d7"""
+
+# The file path to a custom config file
+CUSTOM_CONFIG_PATH = 'LOCATION_CONFIG'

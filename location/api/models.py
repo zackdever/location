@@ -23,13 +23,13 @@ class Location:
     @staticmethod
     def flatten(data):
         """Convert from Python to JSON."""
-
-        data['id'] = str(data['_id'])
-        del data['_id']
+        flat = data.copy()
+        flat['id'] = str(data['_id'])
+        del flat['_id']
 
         # don't make owner public
-        del data['owner']
-        return data
+        del flat['owner']
+        return flat
 
     @staticmethod
     def from_json(data, required_id=None):

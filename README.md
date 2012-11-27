@@ -31,6 +31,10 @@ $ python runserver.py
 
 Test
 ----
+The backend is decently tested, though there is a problem with the current_user
+alias provided by the Flask-Login extension which is preventing testing of some sections.
+There are test written, but they are hidden behind 2 `if False:` statements for now.
+
 ```shell
 $ python runtests.py
 ```

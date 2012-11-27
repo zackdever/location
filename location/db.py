@@ -5,11 +5,13 @@ from pymongo import Connection
 # This way it's that much easier to use in other Python projects.
 import config
 
-def connect():
+def connect(db_name):
     """Connect to the database and ensure indexes."""
 
     conn = Connection(config.DB_HOST, config.DB_PORT)
-    db = conn[config.DATABASE]
+
+    db_name = db_name if db_name is not None else config.DATABASE
+    db = conn[db_name]
 
     if config.DB_USER and config.DB_PW:
         db.authenticate(config.DB_USER, config.DB_PW)
