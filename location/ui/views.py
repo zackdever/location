@@ -1,7 +1,7 @@
 from flask import current_app, render_template
 from flask.ext.login import login_required
 
-from uber.ui import ui
+from location.ui import ui
 
 @ui.route('/')
 @login_required

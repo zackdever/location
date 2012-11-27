@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from pymongo.errors import OperationFailure
 
-from uber.api import api
+from location.api import api
 
 @api.errorhandler(400)
 def bad_request(message=None):

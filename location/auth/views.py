@@ -4,8 +4,8 @@ from flask import (current_app, escape, flash, redirect, render_template,
 from flask.ext.login import current_user, logout_user, login_user
 from pymongo.errors import DuplicateKeyError
 
-from uber.auth import auth
-from uber.auth.models import User
+from location.auth import auth
+from location.auth.models import User
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():

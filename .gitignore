@@ -34,4 +34,4 @@ nosetests.xml
 .project
 .pydevproject
 
-uber/local_config.py
+location/local_config.py

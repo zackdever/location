@@ -6,10 +6,10 @@ from flask.views import MethodView
 from flask.ext.login import current_user, login_required
 from pymongo.errors import OperationFailure
 
-from uber.api import api
-from uber.api.errors import server_error
-from uber.api.utils import ensure_json_content_type, get_or_404
-from uber.api.models import Location
+from location.api import api
+from location.api.errors import server_error
+from location.api.utils import ensure_json_content_type, get_or_404
+from location.api.models import Location
 
 class LocationAPI(MethodView):
     """A simple REST API for locations (named address with lat/lng).

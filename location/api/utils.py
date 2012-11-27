@@ -3,7 +3,7 @@ from functools import wraps
 from bson.objectid import ObjectId
 from flask import request, abort
 
-from uber.api.errors import bad_request
+from location.api.errors import bad_request
 
 def ensure_json_content_type(f):
     """Ensure the 'Content-Type' header is 'application/json'.

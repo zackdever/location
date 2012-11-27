@@ -2,7 +2,7 @@ from bson.objectid import ObjectId
 from flask import Blueprint, current_app
 from flask.ext.login import LoginManager
 
-from uber.auth.models import User
+from location.auth.models import User
 
 auth = Blueprint('auth', __name__)
 
@@ -20,4 +20,4 @@ def load_user(userid):
     user = current_app.db.users.find_one(ObjectId(userid))
     return User(user['username'], user['_id']) if user else None
 
-import uber.auth.views
+import location.auth.views
