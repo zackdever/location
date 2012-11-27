@@ -27,3 +27,7 @@ SSLify(app, subdomains=True)
 app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(auth)
 app.register_blueprint(ui)
+
+def run_server():
+    """Starts the server, as you might expect."""
+    app.run(host=app.config['HOST'], port=app.config['PORT'])
