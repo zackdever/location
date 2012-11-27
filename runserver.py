@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 """
 Starts the server, as you might expect.
 """
