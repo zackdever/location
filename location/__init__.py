@@ -1,14 +1,16 @@
 import os
 
 from flask import Flask
+from flask_sslify import SSLify
 
 from location import db
 from location.api import api
 from location.auth import auth, setup_auth
 from location.ui import ui
 
-# create a Flask app
+# create a Flask app, force SSL when debug is False
 app = Flask(__name__, static_folder='./ui/static')
+SSLify(app, subdomains=True)
 app.config.from_pyfile('config.py')
 
 # set the below env var to your config file path to load custom configs
