@@ -26,6 +26,12 @@ Install
 You already made a a virtualenv right?
 
 ```shell
+$ pip install -r requirements.txt
+```
+
+Run Server
+-------
+```shell
 $ python runserver.py
 ```
 
